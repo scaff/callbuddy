@@ -5,13 +5,76 @@ import BreezeInput from '@/Components/Input.vue';
 import BreezeLabel from '@/Components/Label.vue';
 import BreezeValidationErrors from '@/Components/ValidationErrors.vue';
 import { Head, Link, useForm } from '@inertiajs/inertia-vue3';
+import { computed } from 'vue'
+
+const activityAreas = [{
+  slug: 'bedAndFood',
+  label: 'Hôtellerie / Restauration',
+  sms: [{
+    slug: 'bedAndFood1',
+    text: 'bedAndFood text 1',
+  }, {
+    slug: 'bedAndFood2',
+    text: 'bedAndFood text 2',
+  }, {
+    slug: 'bedAndFood3',
+    text: 'bedAndFood text 3',
+  },]
+},
+{
+  slug: 'healthCare',
+  label: 'Esthétique / Coiffure / Beauté / Bien-être',
+  sms: [{
+    slug: 'healthCare1',
+    text: 'healthCare text 1',
+  }, {
+    slug: 'healthCare2',
+    text: 'healthCare text 2',
+  }, {
+    slug: 'healthCare3',
+    text: 'healthCare text 3',
+  },]
+},
+{
+  slug: 'wellBeing',
+  label: 'Médical / Soin',
+  sms: [{
+    slug: 'wellBeing1',
+    text: 'wellBeing text 1',
+  }, {
+    slug: 'wellBeing2',
+    text: 'wellBeing text 2',
+  }, {
+    slug: 'wellBeing3',
+    text: 'wellBeing text 3',
+  },]
+},
+{
+  slug: 'other',
+  label: 'Autre',
+  sms: [{
+    slug: 'other1',
+    text: 'other text 1',
+  }, {
+    slug: 'other2',
+    text: 'other text 2',
+  }, {
+    slug: 'other3',
+    text: 'other text 3',
+  },]
+}]
+
+const smsList = computed(() => {
+  if(!form.activityArea) return
+
+  const area = (activityAreas.filter((area) => area.slug === form.activityArea))[0]
+  return area.sms
+})
 
 const form = useForm({
-    name: '',
-    email: '',
-    password: '',
-    password_confirmation: '',
-    terms: false,
+    activityArea: '',
+    openingHours: [],
+    bookingLink: '',
 });
 
 const submit = () => {
@@ -29,30 +92,36 @@ const submit = () => {
 
         <form @submit.prevent="submit">
             <div>
-                <BreezeLabel for="name" value="Name" />
-                <BreezeInput id="name" type="text" class="mt-1 block w-full" v-model="form.name" required autofocus autocomplete="name" />
+                <BreezeLabel for="activityArea" value="Secteur d'activité" />
+                <select name="activityArea" id="activityArea" v-model="form.activityArea">
+                  <option 
+                    v-for="activity in activityAreas" 
+                    :key="activity.slug" 
+                    :value="activity.slug"
+                  >{{ activity.label }}</option>
+                </select>
             </div>
-
-            <div class="mt-4">
-                <BreezeLabel for="email" value="Email" />
-                <BreezeInput id="email" type="email" class="mt-1 block w-full" v-model="form.email" required autocomplete="username" />
+            <div v-if="smsList">
+                <BreezeLabel for="activityArea" value="Secteur d'activité" />
+                <select name="activityArea" id="activityArea" v-model="form.sms">
+                  <option 
+                    v-for="sms in smsList" 
+                    :key="sms.slug" 
+                    :value="sms.slug"
+                  >{{ sms.text }}</option>
+                </select>
             </div>
-
-            <div class="mt-4">
-                <BreezeLabel for="password" value="Password" />
-                <BreezeInput id="password" type="password" class="mt-1 block w-full" v-model="form.password" required autocomplete="new-password" />
+            <div>
+                <BreezeLabel for="openingHours" value="Heure d'ouvertures" />
+                <textarea v-model="form.openingHours" />
             </div>
-
+            
             <div class="mt-4">
-                <BreezeLabel for="password_confirmation" value="Confirm Password" />
-                <BreezeInput id="password_confirmation" type="password" class="mt-1 block w-full" v-model="form.password_confirmation" required autocomplete="new-password" />
+                <BreezeLabel for="bookingLink" value="Lien de réservation" />
+                <BreezeInput id="bookingLink" type="bookingLink" class="mt-1 block w-full" v-model="form.bookingLink" required autocomplete="bookingLink" />
             </div>
 
             <div class="flex items-center justify-end mt-4">
-                <Link :href="route('login')" class="underline text-sm text-gray-600 hover:text-gray-900">
-                    Already registered?
-                </Link>
-
                 <BreezeButton class="ml-4" :class="{ 'opacity-25': form.processing }" :disabled="form.processing">
                     Register
                 </BreezeButton>
